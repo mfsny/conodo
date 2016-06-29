@@ -25,6 +25,8 @@ sudo chmod a+w /etc/nomad.d
 SCRIPT
 
 $nomad_server = <<SCRIPT
+export IP_ADDRESS=$(cat /tmp/self.ip)
+echo IP_ADDRESS=$IP_ADDRESS
 nomad version
 cat /vagrant/nomad.server.hcl
 sudo cp -v /vagrant/nomad.server.hcl /etc/nomad
@@ -33,7 +35,13 @@ sudo cp  -v /vagrant/nomad.upstart.conf /etc/init/nomad.conf
 sudo service nomad restart
 sleep 5
 echo done.
-export NOMAD_ADDR=http://192.168.0.11:4646
+if ! grep -q "export NOMAD_ADDR=http" ~/.profile
+then
+  echo "export NOMAD_ADDR=http://$IP_ADDRESS:4646" >>~/.profile
+else
+  sed -i "sed|.*export NOMAD_ADDR=http.*|export NOMAD_ADDR=http://$IP_ADDRESS:4646|" >>~/.profile
+fi
+export NOMAD_ADDR=http://$IP_ADDRESS:4646
 nomad server-members
 nomad node-status
 SCRIPT
