@@ -12,7 +12,6 @@ SCRIPT
 $nomad = <<SCRIPT
 # Download Nomad
 echo Fetching Nomad...
-cd /tmp/
 curl -sSL https://releases.hashicorp.com/nomad/0.3.2/nomad_0.3.2_linux_amd64.zip -o nomad.zip
 echo Installing Nomad...
 unzip nomad.zip
@@ -51,7 +50,6 @@ SCRIPT
 
 $consul = <<SCRIPT
 echo Fetching Consul...
-cd /tmp/
 curl -sSL https://releases.hashicorp.com/consul/0.6.4/consul_0.6.4_linux_amd64.zip -o consul.zip
 echo Installing Consul...
 unzip consul.zip
