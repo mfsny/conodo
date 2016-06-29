@@ -77,6 +77,8 @@ sudo chmod a+w /etc/consul.d
 SCRIPT
 
 $consul_server = <<SCRIPT
+export IP_ADDRESS=$(cat /tmp/self.ip)
+echo IP_ADDRESS=$IP_ADDRESS
 consul version
 cat /vagrant/consul.server.json
 consul configtest -config-file=/vagrant/consul.server.json
@@ -87,17 +89,23 @@ sudo service consul restart
 sleep 5
 echo done.
 echo -n "Adjusting profile ... "
-export CONSUL_RPC_ADDR=192.168.0.21:8400
+if ! grep -q "export CONSUL_RPC_ADDR=http" ~/.profile
+then
+  echo "export CONSUL_RPC_ADDR=$IP_ADDRESS:8400" >>~/.profile
+else
+  sed -i "s|.*export CONSUL_RPC_ADDR=http.*|export CONSUL_RPC_ADDR=$IP_ADDRESS:8400|g" ~/.profile
+fi
 echo done.
 echo -n "Testing configuration ... "
+export CONSUL_RPC_ADDR=$IP_ADDRESS:8400
 consul members
 echo done.
 SCRIPT
 
 $consul_client = <<SCRIPT
-consul version
 export IP_ADDRESS=$(cat /tmp/self.ip)
 echo IP_ADDRESS=$IP_ADDRESS
+consul version
 sudo cp -v /vagrant/consul.client.json /etc/consul
 sudo sed -i s/192.168.0.3x/$IP_ADDRESS/g /etc/consul
 cat /etc/consul
