@@ -98,26 +98,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :nomad do |nomad|
     nomad.vm.hostname = "nomad"
     nomad.vm.network "private_network", ip: "192.168.0.11"
-    #nomad.vm.provision "shell", inline: $init, privileged: false
-    #nomad.vm.provision "shell", inline: $nomad, privileged: false
+    nomad.vm.provision "shell", inline: $init, privileged: false
+    nomad.vm.provision "shell", inline: $nomad, privileged: false
     nomad.vm.provision "shell", inline: $nomad_server, privileged: false
   end
 
   config.vm.define :consul do |consul|
     consul.vm.hostname = "consul"
     consul.vm.network "private_network", ip: "192.168.0.21"
-    #consul.vm.provision "shell", inline: $init, privileged: false
-    #consul.vm.provision "shell", inline: $consul, privileged: false
+    consul.vm.provision "shell", inline: $init, privileged: false
+    consul.vm.provision "shell", inline: $consul, privileged: false
     consul.vm.provision "shell", inline: $consul_server, privileged: false
   end
 
   config.vm.define :client1 do |client1|
     client1.vm.hostname = "client1"
     client1.vm.network "private_network", ip: "192.168.0.31"
-    #client1.vm.provision "shell", inline: $init, privileged: false
-    #client1.vm.provision "shell", inline: $nomad, privileged: false
+    client1.vm.provision "shell", inline: $init, privileged: false
+    client1.vm.provision "shell", inline: $nomad, privileged: false
     client1.vm.provision "shell", inline: $nomad_client, privileged: false
-    #client1.vm.provision "shell", inline: $consul, privileged: false
+    client1.vm.provision "shell", inline: $consul, privileged: false
     client1.vm.provision "shell", inline: $consul_client, privileged: false
     client1.vm.provision "docker" # just install it
   end
