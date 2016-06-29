@@ -2,7 +2,7 @@
 {
   "server": false,
   "datacenter": "dc1",
-  "advertise_addr": "192.168.0.31",
+  "advertise_addr": "192.168.0.3x",
   "client_addr": "0.0.0.0",
   "data_dir": "/tmp/consul",
   "start_join": ["192.168.0.21"],

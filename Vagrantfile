@@ -7,6 +7,9 @@ echo Installing dependencies ....
 sudo apt-get update >>/dev/null
 sudo apt-get install -y unzip curl wget vim
 echo done.
+ifconfig eth1 | grep "inet addr" | awk 'BEGIN { FS = "[ :]+" }{print $4}' >/tmp/self.ip
+export IP_ADDRESS=$(cat /tmp/self.ip)
+echo IP_ADDRESS=$IP_ADDRESS
 SCRIPT
 
 $nomad = <<SCRIPT
@@ -75,15 +78,18 @@ SCRIPT
 
 $consul_client = <<SCRIPT
 consul version
-cat /vagrant/consul.client.json
-consul configtest -config-file=/vagrant/consul.client.json
+export IP_ADDRESS=$(cat /tmp/self.ip)
+echo IP_ADDRESS=$IP_ADDRESS
 sudo cp -v /vagrant/consul.client.json /etc/consul
+sudo sed -i s/192.168.0.3x/$IP_ADDRESS/g /etc/consul
+cat /etc/consul
+consul configtest -config-file=/etc/consul
 echo -n "Starting consul client ... "
 sudo cp  -v /vagrant/consul.upstart.conf /etc/init/consul.conf
 sudo service consul restart
 sleep 5
 echo done.
-export CONSUL_RPC_ADDR=192.168.0.31:8400
+export CONSUL_RPC_ADDR=$IP_ADDRESS:8400
 consul members
 SCRIPT
 
