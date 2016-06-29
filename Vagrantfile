@@ -109,16 +109,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     consul.vm.provision "shell", inline: $consul_server, privileged: false
   end
 
-  config.vm.define :client1 do |client1|
-    client1.vm.hostname = "client1"
-    client1.vm.network "private_network", ip: "192.168.0.31"
-    client1.vm.provision "shell", inline: $init, privileged: false
-    client1.vm.provision "shell", inline: $nomad, privileged: false
-    client1.vm.provision "shell", inline: $nomad_client, privileged: false
-    client1.vm.provision "shell", inline: $consul, privileged: false
-    client1.vm.provision "shell", inline: $consul_client, privileged: false
-    client1.vm.provision "docker" # just install it
+(1..3).each do |i|
+  config.vm.define "client#{i}" do |client|
+    client.vm.hostname = "client#{i}"
+    client.vm.network "private_network", ip: "192.168.0.3#{i}"
+    client.vm.provision "shell", inline: $init, privileged: false
+    client.vm.provision "shell", inline: $nomad, privileged: false
+    client.vm.provision "shell", inline: $nomad_client, privileged: false
+    client.vm.provision "shell", inline: $consul, privileged: false
+    client.vm.provision "shell", inline: $consul_client, privileged: false
+    client.vm.provision "docker" # just install it
   end
+end
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
