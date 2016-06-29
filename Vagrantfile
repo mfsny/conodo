@@ -40,7 +40,7 @@ if ! grep -q "export NOMAD_ADDR=http" ~/.profile
 then
   echo "export NOMAD_ADDR=http://$IP_ADDRESS:4646" >>~/.profile
 else
-  sed -i "sed|.*export NOMAD_ADDR=http.*|export NOMAD_ADDR=http://$IP_ADDRESS:4646|" >>~/.profile
+  sed -i "s|.*export NOMAD_ADDR=http.*|export NOMAD_ADDR=http://$IP_ADDRESS:4646|g" ~/.profile
 fi
 echo done.
 echo -n "Testing configuration ... "
