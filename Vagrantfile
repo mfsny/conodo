@@ -35,15 +35,19 @@ sudo cp  -v /vagrant/nomad.upstart.conf /etc/init/nomad.conf
 sudo service nomad restart
 sleep 5
 echo done.
+echo -n "Adjusting profile ... "
 if ! grep -q "export NOMAD_ADDR=http" ~/.profile
 then
   echo "export NOMAD_ADDR=http://$IP_ADDRESS:4646" >>~/.profile
 else
   sed -i "sed|.*export NOMAD_ADDR=http.*|export NOMAD_ADDR=http://$IP_ADDRESS:4646|" >>~/.profile
 fi
+echo done.
+echo -n "Testing configuration ... "
 export NOMAD_ADDR=http://$IP_ADDRESS:4646
 nomad server-members
 nomad node-status
+echo done.
 SCRIPT
 
 $nomad_client = <<SCRIPT
@@ -55,7 +59,9 @@ sudo cp  -v /vagrant/nomad.upstart.conf /etc/init/nomad.conf
 sudo service nomad restart
 sleep 5
 echo done.
+echo -n "Testing configuration ... "
 nomad node-status
+echo done.
 SCRIPT
 
 
@@ -80,8 +86,12 @@ sudo cp  -v /vagrant/consul.upstart.conf /etc/init/consul.conf
 sudo service consul restart
 sleep 5
 echo done.
+echo -n "Adjusting profile ... "
 export CONSUL_RPC_ADDR=192.168.0.21:8400
+echo done.
+echo -n "Testing configuration ... "
 consul members
+echo done.
 SCRIPT
 
 $consul_client = <<SCRIPT
@@ -97,8 +107,10 @@ sudo cp  -v /vagrant/consul.upstart.conf /etc/init/consul.conf
 sudo service consul restart
 sleep 5
 echo done.
+echo -n "Testing configuration ... "
 export CONSUL_RPC_ADDR=$IP_ADDRESS:8400
 consul members
+echo done.
 SCRIPT
 
 VAGRANTFILE_API_VERSION = "2"
