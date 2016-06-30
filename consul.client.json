@@ -8,6 +8,7 @@
   "start_join": ["192.168.0.21"],
   "retry_join": ["192.168.0.21"],
   "retry_interval": "5s",
+  "encrypt": "AwLCoqz6NccvVC5w1uECVg==",
   "enable_syslog": true,
   "log_level": "DEBUG"
 }
