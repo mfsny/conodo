@@ -126,6 +126,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     nomad.vm.provision "shell", inline: $init, privileged: false
     nomad.vm.provision "shell", inline: $nomad, privileged: false
     nomad.vm.provision "shell", inline: $nomad_server, privileged: false
+    nomad.vm.provision "shell", inline: $consul, privileged: false
+    nomad.vm.provision "shell", inline: $consul_client, privileged: false
     nomad.vm.provision "shell", inline: $consul_config, privileged: false, args: "client"
   end
 
