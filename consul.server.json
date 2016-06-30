@@ -7,5 +7,6 @@
 "data_dir": "/tmp/consul",
 "ui": true,
 "encrypt": "AwLCoqz6NccvVC5w1uECVg==",
+"enable_syslog": true,
 "log_level": "DEBUG"
 }
