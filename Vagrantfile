@@ -79,11 +79,23 @@ SCRIPT
 $consul_server = <<SCRIPT
 export IP_ADDRESS=$(cat /tmp/self.ip)
 echo IP_ADDRESS=$IP_ADDRESS
-consul version
-cat /vagrant/consul.server.json
-consul configtest -config-file=/vagrant/consul.server.json
 sudo cp -v /vagrant/consul.server.json /etc/consul
-echo -n "Starting consul server ... "
+SCRIPT
+
+$consul_client = <<SCRIPT
+export IP_ADDRESS=$(cat /tmp/self.ip)
+echo IP_ADDRESS=$IP_ADDRESS
+sudo cp -v /vagrant/consul.client.json /etc/consul
+SCRIPT
+
+$consul_config = <<SCRIPT
+consul version
+export IP_ADDRESS=$(cat /tmp/self.ip)
+echo IP_ADDRESS=$IP_ADDRESS
+sudo sed -i s/192.168.0.3x/$IP_ADDRESS/g /etc/consul
+cat /etc/consul
+consul configtest -config-file=/etc/consul
+echo -n "Starting consul $1 ... "
 sudo cp  -v /vagrant/consul.upstart.conf /etc/init/consul.conf
 sudo service consul restart
 sleep 5
@@ -95,25 +107,6 @@ then
 else
   sed -i "s|.*export CONSUL_RPC_ADDR=http.*|export CONSUL_RPC_ADDR=$IP_ADDRESS:8400|g" ~/.profile
 fi
-echo done.
-echo -n "Testing configuration ... "
-export CONSUL_RPC_ADDR=$IP_ADDRESS:8400
-consul members
-echo done.
-SCRIPT
-
-$consul_client = <<SCRIPT
-export IP_ADDRESS=$(cat /tmp/self.ip)
-echo IP_ADDRESS=$IP_ADDRESS
-consul version
-sudo cp -v /vagrant/consul.client.json /etc/consul
-sudo sed -i s/192.168.0.3x/$IP_ADDRESS/g /etc/consul
-cat /etc/consul
-consul configtest -config-file=/etc/consul
-echo -n "Starting consul client ... "
-sudo cp  -v /vagrant/consul.upstart.conf /etc/init/consul.conf
-sudo service consul restart
-sleep 5
 echo done.
 echo -n "Testing configuration ... "
 export CONSUL_RPC_ADDR=$IP_ADDRESS:8400
@@ -133,6 +126,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     nomad.vm.provision "shell", inline: $init, privileged: false
     nomad.vm.provision "shell", inline: $nomad, privileged: false
     nomad.vm.provision "shell", inline: $nomad_server, privileged: false
+    nomad.vm.provision "shell", inline: $consul_config, privileged: false, args: "client"
   end
 
   config.vm.define :consul do |consul|
@@ -141,6 +135,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     consul.vm.provision "shell", inline: $init, privileged: false
     consul.vm.provision "shell", inline: $consul, privileged: false
     consul.vm.provision "shell", inline: $consul_server, privileged: false
+    consul.vm.provision "shell", inline: $consul_config, privileged: false, args: "server"
   end
 
 (1..3).each do |i|
@@ -152,6 +147,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     client.vm.provision "shell", inline: $nomad_client, privileged: false
     client.vm.provision "shell", inline: $consul, privileged: false
     client.vm.provision "shell", inline: $consul_client, privileged: false
+    client.vm.provision "shell", inline: $consul_config, privileged: false, args: "client"
     client.vm.provision "docker" # just install it
   end
 end
