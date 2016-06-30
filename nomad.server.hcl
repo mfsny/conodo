@@ -23,3 +23,9 @@ server {
     # Self-elect, should be 3 or 5 for production
     bootstrap_expect = 1
 }
+
+client {
+  options {
+    consul.address = "192.168.0.21:8500"
+  }
+}
