@@ -120,6 +120,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/trusty64"
   config.vm.box_check_update = false
 
+  config.vm.define :consul do |consul|
+    consul.vm.hostname = "consul"
+    consul.vm.network "private_network", ip: "192.168.0.21"
+    consul.vm.provision "shell", inline: $init, privileged: false
+    consul.vm.provision "shell", inline: $consul, privileged: false
+    consul.vm.provision "shell", inline: $consul_server, privileged: false
+    consul.vm.provision "shell", inline: $consul_config, privileged: false, args: "server"
+  end
+
   config.vm.define :nomad do |nomad|
     nomad.vm.hostname = "nomad"
     nomad.vm.network "private_network", ip: "192.168.0.11"
@@ -129,15 +138,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     nomad.vm.provision "shell", inline: $consul, privileged: false
     nomad.vm.provision "shell", inline: $consul_client, privileged: false
     nomad.vm.provision "shell", inline: $consul_config, privileged: false, args: "client"
-  end
-
-  config.vm.define :consul do |consul|
-    consul.vm.hostname = "consul"
-    consul.vm.network "private_network", ip: "192.168.0.21"
-    consul.vm.provision "shell", inline: $init, privileged: false
-    consul.vm.provision "shell", inline: $consul, privileged: false
-    consul.vm.provision "shell", inline: $consul_server, privileged: false
-    consul.vm.provision "shell", inline: $consul_config, privileged: false, args: "server"
   end
 
 (1..3).each do |i|
